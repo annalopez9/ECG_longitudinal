@@ -13,18 +13,60 @@ El archivo está en formato binario, por lo tanto, se lee como binario.
 
 ```{r}
 egc3 <- "ECGPCG0003.dat"
-datos <- readBin(egc3, what = "integer", n = 240000, size = 4) 
-# `size = 4` ya que los datos enteros son de 32 bytes, porque al leer el fichero nos da como 240000 datos (es decir, la división de 960000 bytes que tiene el archivo entre 4 bytes)
+datos <- readBin(egc3, what = "integer", n = 240000, size = 2) 
 plot(datos, type = "l")
-```
 
-Libreria que calcule los picos: 
+```
 
 ```{r}
+library(signal)
+Fs <- 8000  # Asegúrate de que esta sea la frecuencia correcta
 
+# Crear el filtro Butterworth de 4to orden con frecuencia de corte de 15 Hz
+filtro <- butter(4, 15 / (Fs / 2), type = "low")
+
+# Filtrar la señal ECG
+ecg_smooth <- filtfilt(filtro, datos)
+
+# Graficar la señal original
+plot(datos, type="l", main="Señal ECG Original", xlab="Muestras", ylab="Amplitud")
+
+# Graficar la señal filtrada
+plot(ecg_smooth, type="l", main="ECG Filtrado", xlab="Muestras", ylab="Amplitud")
 ```
 
+```{r}
+# Instalar y cargar el paquete necesario
+library(pracma)
 
+# Leer los datos (ya lo tienes)
+egc3 <- "ECGPCG0003.dat"
+datos <- readBin(egc3, what = "integer", n = 240000, size = 2)
+
+# Filtrar la señal (ya lo tienes)
+library(signal)
+Fs <- 8000  # Frecuencia de muestreo
+filtro <- butter(4, 15 / (Fs / 2), type = "low")
+ecg_smooth <- filtfilt(filtro, datos)
+
+# Graficar la señal original
+plot(datos, type="l", main="Señal ECG Original", xlab="Muestras", ylab="Amplitud")
+
+# Graficar la señal filtrada
+plot(ecg_smooth, type="l", main="ECG Filtrado", xlab="Muestras", ylab="Amplitud")
+
+# Detectar los picos en la señal filtrada
+# findpeaks() devuelve los picos (y posiciones de los picos) en la señal
+picos <- findpeaks(ecg_smooth, minpeakheight = 0.5, minpeakdistance = 150)
+
+# Mostrar los picos detectados
+# print(picos)
+
+# Graficar la señal filtrada con los picos detectados
+plot(ecg_smooth, type="l", main="ECG Filtrado con Picos", xlab="Muestras", ylab="Amplitud")
+points(picos[, 2], picos[, 1], col = "red", pch = 19)  # Poner los picos en rojo
+
+```
 
 
 
