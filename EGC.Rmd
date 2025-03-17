@@ -1,0 +1,33 @@
+---
+title: "EGC"
+author: "Anna López Pinilla (1632031)"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, include = TRUE, message = FALSE, warning = FALSE)
+```
+
+El archivo está en formato binario, por lo tanto, se lee como binario.
+
+```{r}
+egc3 <- "ECGPCG0003.dat"
+datos <- readBin(egc3, what = "integer", n = 240000, size = 4) 
+# `size = 4` ya que los datos enteros son de 32 bytes, porque al leer el fichero nos da como 240000 datos (es decir, la división de 960000 bytes que tiene el archivo entre 4 bytes)
+plot(datos, type = "l")
+```
+
+Libreria que calcule los picos: 
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
